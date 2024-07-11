@@ -2,7 +2,6 @@ package ru.practicum.shareit.item;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.error.NotFoundException;
 
@@ -12,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ItemRepository {
     final Map<Long, Item> items = new HashMap<>();
