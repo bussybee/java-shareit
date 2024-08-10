@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.item.comment;
 
 import lombok.AccessLevel;
 import lombok.Data;
@@ -8,25 +8,21 @@ import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-//TODO: связи наоборот?
+
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "bookings")
-public class Booking {
+@Table(name = "comments")
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    @Column(name = "start_date")
-    LocalDateTime start;
-    @Column(name = "end_date")
-    LocalDateTime end;
+    String text;
     @ManyToOne
     @JoinColumn(name = "item_id")
     Item item;
-    @OneToOne
-    @JoinColumn(name = "booker_id")
-    User booker;
-    @Enumerated(EnumType.STRING)
-    BookingStatus status;
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    User author;
+    LocalDateTime created;
 }

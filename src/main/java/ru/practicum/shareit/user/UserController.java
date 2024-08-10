@@ -13,7 +13,7 @@ import ru.practicum.shareit.user.dto.UserUpdateRequestDto;
 import javax.validation.Valid;
 import java.util.List;
 
-
+//TODO: logging?
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
@@ -24,14 +24,16 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserDto> create(@RequestBody @Valid UserDto user) {
-        log.info("Creating user: {}", user);
-        return new ResponseEntity<>(userService.create(user), HttpStatus.CREATED);
+        UserDto createdUser = userService.create(user);
+        log.info("Creating user: {}", createdUser);
+        return new ResponseEntity<>(createdUser, HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<UserDto> update(@RequestBody @Valid UserUpdateRequestDto user, @PathVariable Long id) {
-        log.info("Updating user: {}", user);
-        return new ResponseEntity<>(userService.update(user, id), HttpStatus.OK);
+        UserDto updatedUser = userService.update(user, id);
+        log.info("Updating user: {}", updatedUser);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
     @GetMapping
