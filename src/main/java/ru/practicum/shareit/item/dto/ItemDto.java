@@ -7,6 +7,7 @@ import ru.practicum.shareit.item.comment.Comment;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -19,5 +20,7 @@ public class ItemDto {
     String description;
     @NotNull
     Boolean available;
+    LocalDateTime nextBooking;
+    LocalDateTime lastBooking;
     List<Comment> comments;
 }

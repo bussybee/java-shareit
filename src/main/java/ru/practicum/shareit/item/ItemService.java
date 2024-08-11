@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.error.NotFoundException;
-import ru.practicum.shareit.item.comment.Comment;
-import ru.practicum.shareit.item.comment.CommentDto;
-import ru.practicum.shareit.item.comment.CommentMapper;
-import ru.practicum.shareit.item.comment.CommentRepository;
+import ru.practicum.shareit.item.comment.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemGetAllResponseDto;
 import ru.practicum.shareit.item.dto.ItemUpdateRequestDto;
@@ -113,20 +110,21 @@ public class ItemService {
         }
     }
 
-    public CommentDto addComment(Long id, Long userId, CommentDto commentDto) {
+    public CommentResponseDto addComment(Long id, Long userId, CommentDto commentDto) {
         bookingRepository.findAllByItem_Id(id).stream()
-                .filter(booking -> booking.getItem().getOwner().getId().equals(userId))
-                .findFirst()
+                .filter(booking -> booking.getBooker().getId().equals(userId))
                 .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
+                .findFirst()
                 .orElseThrow();
 
         Comment comment = commentMapper.toComment(commentDto);
-        Item item = itemRepository.findById(id).orElseThrow();
+        Item item = itemRepository.findById(id).orElseThrow(() -> new NotFoundException("Вещь не найдена"));
         User author = userMapper.toUser(userService.getById(userId));
 
         comment.setItem(item);
         comment.setAuthor(author);
+        comment.setCreated(LocalDateTime.now());
 
-        return commentMapper.toDTO(commentRepository.save(comment));
+        return commentMapper.toResponseDto(commentRepository.save(comment));
     }
 }

@@ -8,7 +8,7 @@ import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-//TODO: связи наоборот?
+
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity

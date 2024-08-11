@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
+import ru.practicum.shareit.error.ValidationException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemService;
@@ -38,13 +39,13 @@ public class BookingService {
         booking.setBooker(booker);
         booking.setItem(item);
         booking.setStatus(BookingStatus.WAITING);
-        //TODO: другие исключения?
+
         if (booking.getStart().isEqual(booking.getEnd())) {
-            throw new IllegalArgumentException("Время начала и окончания не могут совпадать");
+            throw new ValidationException("Время начала и окончания не могут совпадать");
         }
 
         if (!item.getAvailable()) {
-            throw new IllegalArgumentException("Вещь не доступна для аренды");
+            throw new ValidationException("Вещь не доступна для аренды");
         }
 
         return bookingMapper.toResponseDto(bookingRepository.save(booking));
@@ -64,35 +65,35 @@ public class BookingService {
 
     public BookingResponseDto getById(Long id, Long userId) {
         Optional<Booking> booking = bookingRepository.findById(id);
-        //TODO: заменить на запросы?
+
         if (booking.isPresent() && (booking.get().getItem().getOwner().getId().equals(userId)
                 || booking.get().getBooker().getId().equals(userId))) {
             return bookingMapper.toResponseDto(booking.get());
         } else {
-            throw new RuntimeException();
+            throw new ValidationException("Бронирование не найдено");
         }
     }
 
-    public List<BookingResponseDto> getAllByUser(Long userId, String state) {
+    public List<BookingResponseDto> getAllByUser(Long userId, BookingState state) {
         List<Booking> allBookings = new ArrayList<>();
 
         switch (state) {
-            case "ALL":
+            case ALL:
                 allBookings =  bookingRepository.findAllByBooker_IdOrderByStart(userId);
                 break;
-            case "CURRENT":
+            case CURRENT:
                 allBookings = bookingRepository.findAllByBooker_IdAndEndIsAfterOrderByStart(userId, LocalDateTime.now());
                 break;
-            case "PAST":
+            case PAST:
                 allBookings = bookingRepository.findAllByBooker_IdAndEndIsBeforeOrderByStart(userId, LocalDateTime.now());
                 break;
-            case "FUTURE":
+            case FUTURE:
                 allBookings = bookingRepository.findAllByBooker_IdAndStartIsAfterOrderByStart(userId, LocalDateTime.now());
                 break;
-            case "WAITING":
+            case WAITING:
                 allBookings = bookingRepository.findAllByBooker_IdAndStatusOrderByStart(userId, BookingStatus.WAITING);
                 break;
-            case "REJECTING":
+            case REJECTING:
                 allBookings = bookingRepository.findAllByBooker_IdAndStatusOrderByStart(userId, BookingStatus.REJECTED);
         }
 

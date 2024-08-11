@@ -19,7 +19,6 @@ public class Item {
     String name;
     String description;
     Boolean available;
-    //TODO: FetchType?
     @ManyToOne()
     @JoinColumn(name = "owner_id")
     User owner;

@@ -31,13 +31,13 @@ public class UserService {
     }
 
     public UserDto update(UserUpdateRequestDto userDto, Long id) {
-        Optional<User> userRep = userRepository.findById(id);
+        User userRep = userRepository.findById(id).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
         User user = userMapper.toUser(userDto);
         isEmailExists(user);
-        //TODO: orElseThrow?
+
         user.setId(id);
-        user.setName(userDto.getName() == null ? userRep.orElseThrow().getName() : userDto.getName());
-        user.setEmail(userDto.getEmail() == null ? userRep.orElseThrow().getEmail() : userDto.getEmail());
+        user.setName(userDto.getName() == null ? userRep.getName() : userDto.getName());
+        user.setEmail(userDto.getEmail() == null ? userRep.getEmail() : userDto.getEmail());
 
         return userMapper.toDTO(userRepository.save(user));
     }

@@ -23,25 +23,32 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<BookingResponseDto> create(@RequestBody @Valid BookingDto bookingDto,
-                                                     @RequestHeader(name = "X-Sharer-User-Id", required = false) Long userId) {
-        return new ResponseEntity<>(bookingService.create(bookingDto, userId), HttpStatus.OK);
+                                                     @RequestHeader(name = "X-Sharer-User-Id") Long userId) {
+        BookingResponseDto booking = bookingService.create(bookingDto, userId);
+        log.info("Booking created {}", booking);
+        return new ResponseEntity<>(booking, HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<BookingResponseDto> approve(@PathVariable Long id, @RequestParam Boolean approved,
-                                                      @RequestHeader(name = "X-Sharer-User-Id", required = false) Long userId) {
+                                                      @RequestHeader(name = "X-Sharer-User-Id") Long userId) {
+        log.info("Booking approved with id {}", id);
         return new ResponseEntity<>(bookingService.approve(id, approved, userId), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<BookingResponseDto> getById(@PathVariable Long id,
-                                                  @RequestHeader(name = "X-Sharer-User-Id", required = false ) Long userId) {
-        return new ResponseEntity<>(bookingService.getById(id, userId), HttpStatus.OK);
+                                                      @RequestHeader(name = "X-Sharer-User-Id") Long userId) {
+        BookingResponseDto booking = bookingService.getById(id, userId);
+        log.info("Getting booking {}", booking);
+        return new ResponseEntity<>(booking, HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<List<BookingResponseDto>> getAllByUser(@RequestHeader(name = "X-Sharer-User-Id", required = false) Long userId,
-                                                                  @RequestParam(required = false, defaultValue = "ALL") String state) {
+    public ResponseEntity<List<BookingResponseDto>> getAllByUser(
+            @RequestHeader(name = "X-Sharer-User-Id") Long userId,
+            @RequestParam(required = false, defaultValue = "ALL") BookingState state) {
+        log.info("Getting all bookings by user {}", userId);
         return new ResponseEntity<>(bookingService.getAllByUser(userId, state), HttpStatus.OK);
     }
 }
