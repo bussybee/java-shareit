@@ -5,6 +5,10 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface CommentMapper {
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "item", ignore = true)
+    @Mapping(target = "author", ignore = true)
+    @Mapping(target = "created", ignore = true)
     Comment toComment(CommentDto commentDto);
 
     @Mapping(source = "author.name", target = "authorName")

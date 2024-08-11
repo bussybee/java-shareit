@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.error.NotFoundException;
 import ru.practicum.shareit.error.UserInvalidDataException;
@@ -19,7 +18,6 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @Slf4j
-@Profile("def")
 public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
