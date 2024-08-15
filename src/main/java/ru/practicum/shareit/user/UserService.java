@@ -4,8 +4,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.error.NotFoundException;
 import ru.practicum.shareit.error.UserInvalidDataException;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -19,17 +19,18 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @Slf4j
-@Profile("def")
 public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
 
+    @Transactional
     public UserDto create(UserDto userDto) {
         User user = userMapper.toUser(userDto);
         isEmailExists(user);
         return userMapper.toDTO(userRepository.save(user));
     }
 
+    @Transactional
     public UserDto update(UserUpdateRequestDto userDto, Long id) {
         User userRep = userRepository.findById(id).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
         User user = userMapper.toUser(userDto);
@@ -50,17 +51,20 @@ public class UserService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<UserDto> getAll() {
         return userRepository.findAll().stream()
                 .map(userMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public UserDto getById(Long id) {
         return userMapper.toDTO(userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден")));
     }
 
+    @Transactional
     public void delete(Long id) {
         userRepository.deleteById(id);
     }

@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.error.ValidationException;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
+@Transactional
 public class BookingService {
     BookingRepository bookingRepository;
     BookingMapper bookingMapper;
@@ -63,6 +65,7 @@ public class BookingService {
         return bookingMapper.toResponseDto(bookingRepository.save(booking));
     }
 
+    @Transactional(readOnly = true)
     public BookingResponseDto getById(Long id, Long userId) {
         Optional<Booking> booking = bookingRepository.findById(id);
 
@@ -74,10 +77,11 @@ public class BookingService {
         }
     }
 
+    @Transactional
     public List<BookingResponseDto> getAllByUser(Long userId, BookingState state) {
         List<Booking> allBookings = new ArrayList<>();
 
-        switch (state) {
+        switch (Optional.ofNullable(state).orElse(BookingState.ALL)) {
             case ALL:
                 allBookings =  bookingRepository.findAllByBooker_IdOrderByStart(userId);
                 break;

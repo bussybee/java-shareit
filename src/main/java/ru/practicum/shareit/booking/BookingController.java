@@ -47,7 +47,7 @@ public class BookingController {
     @GetMapping
     public ResponseEntity<List<BookingResponseDto>> getAllByUser(
             @RequestHeader(name = "X-Sharer-User-Id") Long userId,
-            @RequestParam(required = false, defaultValue = "ALL") BookingState state) {
+            @RequestParam(required = false) BookingState state) {
         log.info("Getting all bookings by user {}", userId);
         return new ResponseEntity<>(bookingService.getAllByUser(userId, state), HttpStatus.OK);
     }
