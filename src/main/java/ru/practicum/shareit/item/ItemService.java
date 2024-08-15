@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.error.NotFoundException;
@@ -16,15 +17,13 @@ import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
+@Transactional
 public class ItemService {
     ItemRepository itemRepository;
     ItemMapper itemMapper;
@@ -43,22 +42,23 @@ public class ItemService {
 
     public ItemDto update(ItemUpdateRequestDto itemDto, Long id, Long userId) {
         User owner = userMapper.toUser(userService.getById(userId));
-        Optional<Item> itemRep = itemRepository.findById(id);
+        Item itemRep = itemRepository.findById(id).orElseThrow();
         Item item = itemMapper.toItem(itemDto);
 
         item.setId(id);
         item.setOwner(owner);
-        item.setName(itemDto.getName() == null ? itemRep.orElseThrow().getName() : itemDto.getName());
-        item.setDescription(itemDto.getDescription() == null ? itemRep.orElseThrow().getDescription() : itemDto.getDescription());
-        item.setAvailable(itemDto.getAvailable() == null ? itemRep.orElseThrow().getAvailable() : itemDto.getAvailable());
+        item.setName(itemDto.getName() == null ? itemRep.getName() : itemDto.getName());
+        item.setDescription(itemDto.getDescription() == null ? itemRep.getDescription() : itemDto.getDescription());
+        item.setAvailable(itemDto.getAvailable() == null ? itemRep.getAvailable() : itemDto.getAvailable());
 
-        if (!itemRep.orElseThrow().getOwner().equals(owner)) {
+        if (!itemRep.getOwner().equals(owner)) {
             throw new NotFoundException("Введен некорректный пользователь");
         }
 
         return itemMapper.toDTO(itemRepository.save(item));
     }
 
+    @Transactional(readOnly = true)
     public ItemDto getById(Long id, Long userId) {
         userService.getById(userId);
         ItemDto itemDto = itemMapper.toDTO(itemRepository.findById(id)
@@ -67,37 +67,42 @@ public class ItemService {
         return itemDto;
     }
 
+    @Transactional
     public List<ItemGetAllResponseDto> getAll(Long userId) {
         userService.getById(userId);
 
-        List<ItemGetAllResponseDto> items = new ArrayList<>();
-        List<Item> allOwnerItems = itemRepository.findAllByOwner_Id(userId);
+        List<Item> ownerItems = itemRepository.findAllByOwner_Id(userId);
+        Map<Long, List<Comment>> commentsByItem = commentRepository.findByItemIn(ownerItems).stream()
+                .collect(Collectors.groupingBy(comment -> comment.getItem().getId()));
+        Map<Long, List<Booking>> bookingsByItem = bookingRepository.findAllByItemIn(ownerItems).stream()
+                .collect(Collectors.groupingBy(booking -> booking.getItem().getId()));
 
-        for (Item item : allOwnerItems) {
-            ItemGetAllResponseDto itemDto = itemMapper.toResponseDTO(item);
-            itemDto.setComments(commentRepository.findByAuthor_IdAndItem_Id(userId, item.getId()));
+        return ownerItems.stream()
+                .map(item -> {
+                    ItemGetAllResponseDto itemDto = itemMapper.toResponseDTO(item);
+                    itemDto.setComments(commentsByItem.getOrDefault(item.getId(), Collections.emptyList()));
 
-            List<Booking> bookings = bookingRepository.findAllByItem_Id(item.getId());
+                    List<Booking> bookings = bookingsByItem.getOrDefault(item.getId(), Collections.emptyList());
 
-            Booking lastBooking = bookings.stream()
-                    .filter(booking -> booking.getStart().isBefore(LocalDateTime.now()))
-                    .max(Comparator.comparing(Booking::getStart))
-                    .orElse(null);
+                    Booking lastBooking = bookings.stream()
+                            .filter(booking -> booking.getStart().isBefore(LocalDateTime.now()))
+                            .max(Comparator.comparing(Booking::getStart))
+                            .orElse(null);
 
-            Booking nextBooking = bookings.stream()
-                    .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
-                    .min(Comparator.comparing(Booking::getStart))
-                    .orElse(null);
+                    Booking nextBooking = bookings.stream()
+                            .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
+                            .min(Comparator.comparing(Booking::getStart))
+                            .orElse(null);
 
-            itemDto.setLastBooking(lastBooking != null ? lastBooking.getEnd() : null);
-            itemDto.setNextBooking(nextBooking != null ? nextBooking.getStart() : null);
+                    itemDto.setLastBooking(lastBooking != null ? lastBooking.getEnd() : null);
+                    itemDto.setNextBooking(nextBooking != null ? nextBooking.getStart() : null);
 
-            items.add(itemDto);
-        }
-
-        return items;
+                    return itemDto;
+                })
+                .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<ItemDto> searchByText(String text, Long userId) {
         if (text == null || text.isEmpty()) {
             return new ArrayList<>();
