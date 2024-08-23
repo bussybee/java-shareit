@@ -1,12 +1,12 @@
 package ru.practicum.shareit.item.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.item.comment.Comment;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,6 +20,7 @@ public class ItemDto {
     String description;
     @NotNull
     Boolean available;
+    Long requestId;
     LocalDateTime nextBooking;
     LocalDateTime lastBooking;
     List<Comment> comments;

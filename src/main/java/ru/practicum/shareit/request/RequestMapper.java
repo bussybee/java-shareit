@@ -1,0 +1,17 @@
+package ru.practicum.shareit.request;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
+import ru.practicum.shareit.request.dto.RequestDto;
+import ru.practicum.shareit.request.dto.ResponseDto;
+import ru.practicum.shareit.request.dto.ResponseDtoWithItems;
+
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface RequestMapper {
+
+    ItemRequest toEntity(RequestDto requestDto);
+
+    ResponseDto toDto(ItemRequest itemRequest);
+
+    ResponseDtoWithItems toDtoWithItems(ItemRequest itemRequest);
+}

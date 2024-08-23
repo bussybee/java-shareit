@@ -12,4 +12,6 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "where i.name ilike concat('%', ?1, '%') or " +
             "i.description ilike concat('%', ?1, '%')", nativeQuery = true)
     List<Item> searchByText(String text);
+
+    List<Item> findByRequest_Id(Long id);
 }

@@ -1,11 +1,13 @@
 package ru.practicum.shareit.item;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoForRequest;
 import ru.practicum.shareit.item.dto.ItemGetAllResponseDto;
 import ru.practicum.shareit.item.dto.ItemUpdateRequestDto;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ItemMapper {
 
     ItemDto toDTO(Item item);
@@ -15,4 +17,6 @@ public interface ItemMapper {
     Item toItem(ItemUpdateRequestDto requestDto);
 
     ItemGetAllResponseDto toResponseDTO(Item item);
+
+    ItemDtoForRequest toResponse(Item item);
 }
