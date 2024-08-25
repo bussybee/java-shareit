@@ -10,9 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserUpdateRequestDto;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
-
 
 @RestController
 @RequestMapping(path = "/users")
@@ -24,26 +23,30 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserDto> create(@RequestBody @Valid UserDto user) {
-        log.info("Creating user: {}", user);
-        return new ResponseEntity<>(userService.create(user), HttpStatus.CREATED);
+        UserDto createdUser = userService.create(user);
+        log.info("User created: {}", createdUser);
+        return new ResponseEntity<>(createdUser, HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<UserDto> update(@RequestBody @Valid UserUpdateRequestDto user, @PathVariable Long id) {
-        log.info("Updating user: {}", user);
-        return new ResponseEntity<>(userService.update(user, id), HttpStatus.OK);
+        UserDto updatedUser = userService.update(user, id);
+        log.info("User updated: {}", updatedUser);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
     @GetMapping
     public ResponseEntity<List<UserDto>> getAll() {
-        log.info("Getting all users");
-        return new ResponseEntity<>(userService.getAll(), HttpStatus.OK);
+        List<UserDto> allUsers = userService.getAll();
+        log.info("Getting {} users", allUsers.size());
+        return new ResponseEntity<>(allUsers, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getById(@PathVariable Long id) {
-        log.info("Getting user by id: {}", id);
-        return new ResponseEntity<>(userService.getById(id), HttpStatus.OK);
+        UserDto user = userService.getById(id);
+        log.info("Getting user: {}", user);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

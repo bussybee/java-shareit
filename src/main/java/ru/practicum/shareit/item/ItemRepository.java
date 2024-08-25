@@ -1,46 +1,15 @@
 package ru.practicum.shareit.item;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-import org.springframework.stereotype.Component;
-import ru.practicum.shareit.error.NotFoundException;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-@Component
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class ItemRepository {
-    final Map<Long, Item> items = new HashMap<>();
-    Long idGenerator = 1L;
+public interface ItemRepository extends JpaRepository<Item, Long> {
+    List<Item> findAllByOwner_Id(Long id);
 
-    public Item save(Item item) {
-        item.setId(idGenerator++);
-        item.setName(item.getName());
-        item.setDescription(item.getDescription());
-
-        items.put(item.getId(), item);
-
-        return item;
-    }
-
-
-    public Item update(Item item) {
-        items.put(item.getId(), item);
-        return item;
-    }
-
-    public Item findById(Long id) {
-        Item item = items.get(id);
-        if (item == null) {
-            throw new NotFoundException(String.format("Item with id=%s not found", id));
-        }
-        return item;
-    }
-
-    public List<Item> getAll() {
-        return new ArrayList<>(items.values());
-    }
+    @Query(value = "select * from items as i " +
+            "where i.name ilike concat('%', ?1, '%') or " +
+            "i.description ilike concat('%', ?1, '%')", nativeQuery = true)
+    List<Item> searchByText(String text);
 }

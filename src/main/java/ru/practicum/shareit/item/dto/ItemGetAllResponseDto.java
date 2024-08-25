@@ -12,7 +12,7 @@ import java.util.List;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ItemDto {
+public class ItemGetAllResponseDto {
     Long id;
     @NotBlank
     String name;

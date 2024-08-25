@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
-import javax.validation.constraints.Email;
+import jakarta.validation.constraints.Email;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
