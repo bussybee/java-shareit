@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.item.Item;
 import ru.practicum.item.ItemRepository;
@@ -29,6 +30,7 @@ public class RequestServiceTest {
     ItemRepository itemRepository;
 
     @Test
+    @DirtiesContext
     void getAllByRequester() {
         User user1 = User.builder().name("john").email("sina").build();
         User user2 = User.builder().name("carri").email("brad").build();

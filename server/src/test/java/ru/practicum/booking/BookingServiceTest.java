@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.booking.dto.BookingResponseDto;
 import ru.practicum.item.Item;
@@ -30,6 +31,7 @@ public class BookingServiceTest {
     ItemRepository itemRepository;
 
     @Test
+    @DirtiesContext
     void getAllUserBookings() {
         User booker = userRepository.save(User.builder().name("john").email("sina").build());
         User owner = userRepository.save(User.builder().name("carri").email("brad").build());
