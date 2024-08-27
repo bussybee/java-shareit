@@ -40,7 +40,7 @@ public class UserClient extends BaseClient {
         return get("/" + userId);
     }
 
-    public void delete(Long userId) {
-        delete("/" + userId);
+    public ResponseEntity<Object> delete(Long userId) {
+        return delete("/" + userId);
     }
 }

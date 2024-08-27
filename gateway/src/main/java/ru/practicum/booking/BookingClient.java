@@ -11,6 +11,7 @@ import ru.practicum.booking.dto.BookingDto;
 import ru.practicum.client.BaseClient;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class BookingClient extends BaseClient {
@@ -39,7 +40,12 @@ public class BookingClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getAllByUser(Long userId, BookingState state) {
-        Map<String, Object> parameters = Map.of("state", state);
+        Map<String, Object> parameters;
+        if (Optional.ofNullable(state).isPresent()) {
+            parameters = Map.of("state", state.name());
+        } else {
+            parameters = Map.of();
+        }
         return get("", userId, parameters);
     }
 }
