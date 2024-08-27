@@ -82,6 +82,7 @@ public class BookingService {
 
     @Transactional
     public List<BookingResponseDto> getAllByUser(Long userId, BookingState state) {
+        userService.getById(userId);
         List<Booking> allBookings = new ArrayList<>();
 
         switch (Optional.ofNullable(state).orElse(BookingState.ALL)) {
