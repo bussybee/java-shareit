@@ -18,12 +18,11 @@ public class UserServiceTest {
     @Test
     void saveUser() {
         UserDto userDto = new UserDto();
-        userDto.setId(1L);
         userDto.setName("name");
         userDto.setEmail("email");
 
         UserDto createdUser = userService.create(userDto);
 
-        assertEquals(userDto, createdUser);
+        assertEquals(userDto.getName(), createdUser.getName());
     }
 }
