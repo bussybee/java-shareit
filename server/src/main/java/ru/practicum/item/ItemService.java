@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.booking.Booking;
 import ru.practicum.booking.BookingRepository;
+import ru.practicum.booking.BookingStatus;
 import ru.practicum.error.NotFoundException;
 import ru.practicum.item.comment.*;
 import ru.practicum.item.dto.ItemDto;
@@ -133,6 +134,7 @@ public class ItemService {
         bookingRepository.findAllByItem_Id(id).stream()
                 .filter(booking -> booking.getBooker().getId().equals(userId))
                 .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
+                .filter(booking -> booking.getStatus().equals(BookingStatus.APPROVED))
                 .findFirst()
                 .orElseThrow();
 
