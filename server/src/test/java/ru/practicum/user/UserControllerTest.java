@@ -45,7 +45,7 @@ public class UserControllerTest {
 
     @Test
     void saveNewUser() throws Exception {
-        when(userService.create(any()))
+        when(userService.create(any(UserDto.class)))
                 .thenReturn(userDto);
 
         mvc.perform(post("/users")
@@ -57,7 +57,6 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.id", is(1L), Long.class))
                 .andExpect(jsonPath("$.name", is(userDto.getName())))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())));
-
     }
 
     @Test

@@ -84,34 +84,36 @@ public class ItemService {
         userService.getById(userId);
 
         List<Item> ownerItems = itemRepository.findAllByOwner_Id(userId);
+
         Map<Long, List<Comment>> commentsByItem = commentRepository.findByItemIn(ownerItems).stream()
                 .collect(Collectors.groupingBy(comment -> comment.getItem().getId()));
         Map<Long, List<Booking>> bookingsByItem = bookingRepository.findAllByItemIn(ownerItems).stream()
                 .collect(Collectors.groupingBy(booking -> booking.getItem().getId()));
 
         return ownerItems.stream()
-                .map(item -> {
-                    ItemGetAllResponseDto itemDto = itemMapper.toResponseDTO(item);
-                    itemDto.setComments(commentsByItem.getOrDefault(item.getId(), Collections.emptyList()));
-
-                    List<Booking> bookings = bookingsByItem.getOrDefault(item.getId(), Collections.emptyList());
-
-                    Booking lastBooking = bookings.stream()
-                            .filter(booking -> booking.getStart().isBefore(LocalDateTime.now()))
-                            .max(Comparator.comparing(Booking::getStart))
-                            .orElse(null);
-
-                    Booking nextBooking = bookings.stream()
-                            .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
-                            .min(Comparator.comparing(Booking::getStart))
-                            .orElse(null);
-
-                    itemDto.setLastBooking(lastBooking != null ? lastBooking.getEnd() : null);
-                    itemDto.setNextBooking(nextBooking != null ? nextBooking.getStart() : null);
-
-                    return itemDto;
-                })
+                .map(item -> setItemParameters(item, commentsByItem.getOrDefault(item.getId(), Collections.emptyList()),
+                        bookingsByItem.getOrDefault(item.getId(), Collections.emptyList())))
                 .collect(Collectors.toList());
+    }
+
+    private ItemGetAllResponseDto setItemParameters(Item item, List<Comment> comments, List<Booking> bookings) {
+        ItemGetAllResponseDto itemDto = itemMapper.toResponseDTO(item);
+        itemDto.setComments(comments);
+
+        Booking lastBooking = bookings.stream()
+                .filter(booking -> booking.getStart().isBefore(LocalDateTime.now()))
+                .max(Comparator.comparing(Booking::getStart))
+                .orElse(null);
+
+        Booking nextBooking = bookings.stream()
+                .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
+                .min(Comparator.comparing(Booking::getStart))
+                .orElse(null);
+
+        itemDto.setLastBooking(lastBooking != null ? lastBooking.getEnd() : null);
+        itemDto.setNextBooking(nextBooking != null ? nextBooking.getStart() : null);
+
+        return itemDto;
     }
 
     @Transactional(readOnly = true)

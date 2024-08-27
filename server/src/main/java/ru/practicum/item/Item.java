@@ -13,6 +13,7 @@ import ru.practicum.user.User;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 @Table(name = "items")

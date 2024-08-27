@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping(path = "/requests")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class ItemRequestController {
+public class RequestController {
     RequestService requestService;
 
     @PostMapping

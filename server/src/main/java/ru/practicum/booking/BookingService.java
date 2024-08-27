@@ -56,9 +56,11 @@ public class BookingService {
 
     public BookingResponseDto approve(Long id, Boolean approved, Long userId) {
         Booking booking = bookingMapper.toBooking(getById(id, userId));
+        Item item = itemMapper.toItem(itemService.getById(booking.getItem().getId(), userId));
 
         if (approved.equals(true)) {
             booking.setStatus(BookingStatus.APPROVED);
+            item.setAvailable(false);
         } else {
             booking.setStatus(BookingStatus.REJECTED);
         }
