@@ -81,7 +81,7 @@ public class BookingService {
     }
 
     @Transactional
-    public List<BookingResponseDto> getAllByUser(Long userId, BookingState state) {
+    public List<BookingResponseDto> getAllByBooker(Long userId, BookingState state) {
         userService.getById(userId);
         List<Booking> allBookings = new ArrayList<>();
 
@@ -103,6 +103,36 @@ public class BookingService {
                 break;
             case REJECTING:
                 allBookings = bookingRepository.findAllByBooker_IdAndStatusOrderByStart(userId, BookingStatus.REJECTED);
+        }
+
+        return allBookings.stream()
+                .map(bookingMapper::toResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<BookingResponseDto> getAllByOwner(Long userId, BookingState state) {
+        userService.getById(userId);
+        List<Booking> allBookings = new ArrayList<>();
+
+        switch (Optional.ofNullable(state).orElse(BookingState.ALL)) {
+            case ALL:
+                allBookings =  bookingRepository.findAllByItemOwner_IdOrderByStart(userId);
+                break;
+            case CURRENT:
+                allBookings = bookingRepository.findAllByItemOwner_IdAndEndIsAfterOrderByStart(userId, LocalDateTime.now());
+                break;
+            case PAST:
+                allBookings = bookingRepository.findAllByItemOwner_IdAndEndIsBeforeOrderByStart(userId, LocalDateTime.now());
+                break;
+            case FUTURE:
+                allBookings = bookingRepository.findAllByItemOwner_IdAndStartIsAfterOrderByStart(userId, LocalDateTime.now());
+                break;
+            case WAITING:
+                allBookings = bookingRepository.findAllByItemOwner_IdAndStatusOrderByStart(userId, BookingStatus.WAITING);
+                break;
+            case REJECTING:
+                allBookings = bookingRepository.findAllByItemOwner_IdAndStatusOrderByStart(userId, BookingStatus.REJECTED);
         }
 
         return allBookings.stream()

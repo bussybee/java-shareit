@@ -57,11 +57,11 @@ public class BookingServiceTest {
                 .status(BookingStatus.WAITING)
                 .build());
 
-        List<BookingResponseDto> allBookings = bookingService.getAllByUser(1L, null);
+        List<BookingResponseDto> allBookings = bookingService.getAllByBooker(1L, null);
         assertThat(allBookings).hasSize(2);
         assertEquals(allBookings.getFirst().getStatus(), BookingStatus.APPROVED);
 
-        List<BookingResponseDto> futureBookings = bookingService.getAllByUser(1L, BookingState.FUTURE);
+        List<BookingResponseDto> futureBookings = bookingService.getAllByBooker(1L, BookingState.FUTURE);
         assertThat(futureBookings).hasSize(1);
         assertEquals(futureBookings.getFirst().getStatus(), BookingStatus.WAITING);
     }

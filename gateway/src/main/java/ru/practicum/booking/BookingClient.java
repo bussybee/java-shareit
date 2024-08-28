@@ -39,7 +39,7 @@ public class BookingClient extends BaseClient {
         return get("/" + id, userId);
     }
 
-    public ResponseEntity<Object> getAllByUser(Long userId, BookingState state) {
+    public ResponseEntity<Object> getAllByBooker(Long userId, BookingState state) {
         Map<String, Object> parameters;
         if (Optional.ofNullable(state).isPresent()) {
             parameters = Map.of("state", state.name());
@@ -47,5 +47,15 @@ public class BookingClient extends BaseClient {
             parameters = Map.of();
         }
         return get("", userId, parameters);
+    }
+
+    public ResponseEntity<Object> getAllByOwner(Long userId, BookingState state) {
+        Map<String, Object> parameters;
+        if (Optional.ofNullable(state).isPresent()) {
+            parameters = Map.of("state", state.name());
+        } else {
+            parameters = Map.of();
+        }
+        return get("/owner", userId, parameters);
     }
 }

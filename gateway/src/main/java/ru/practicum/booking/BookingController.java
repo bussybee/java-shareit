@@ -38,9 +38,16 @@ public class BookingController {
     }
 
     @GetMapping()
-    public ResponseEntity<Object> getAllByUser(@RequestHeader(name = "X-Sharer-User-Id") Long userId,
+    public ResponseEntity<Object> getAllByBooker(@RequestHeader(name = "X-Sharer-User-Id") Long userId,
                                                @RequestParam(required = false) BookingState state) {
-        log.info("Get bookings by user: {}", userId);
-        return bookingClient.getAllByUser(userId, state);
+        log.info("Get bookings by booker: {}", userId);
+        return bookingClient.getAllByBooker(userId, state);
+    }
+
+    @GetMapping("/owner")
+    public ResponseEntity<Object> getAllByOwner(@RequestHeader(name = "X-Sharer-User-Id") Long userId,
+                                                 @RequestParam(required = false) BookingState state) {
+        log.info("Get bookings by owner: {}", userId);
+        return bookingClient.getAllByOwner(userId, state);
     }
 }
