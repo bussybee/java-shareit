@@ -11,6 +11,8 @@ import ru.practicum.item.comment.CommentDto;
 import ru.practicum.item.dto.ItemDto;
 import ru.practicum.item.dto.ItemUpdateRequestDto;
 
+import java.util.ArrayList;
+
 @Controller
 @RequestMapping(path = "/items")
 @RequiredArgsConstructor
@@ -21,7 +23,7 @@ public class ItemController {
 
     @PostMapping
     public ResponseEntity<Object> create(@RequestBody @Valid ItemDto item,
-                                          @RequestHeader(name = "X-Sharer-User-Id") Long userId) {
+                                         @RequestHeader(name = "X-Sharer-User-Id") Long userId) {
         log.info("Creating new item {}", item);
         return itemClient.create(item, userId);
     }
@@ -49,8 +51,12 @@ public class ItemController {
     @GetMapping("/search")
     public ResponseEntity<Object> searchByText(@RequestParam String text,
                                                @RequestHeader(name = "X-Sharer-User-Id") Long userId) {
-        log.info("Searching for items with text {}", text);
-        return itemClient.searchByText(userId, text);
+        if (text == null || text.isEmpty()) {
+            return ResponseEntity.ok(new ArrayList<>());
+        } else {
+            log.info("Searching for items with text {}", text);
+            return itemClient.searchByText(userId, text);
+        }
     }
 
     @PostMapping("/{id}/comment")

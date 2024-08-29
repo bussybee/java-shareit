@@ -9,7 +9,7 @@ import ru.practicum.booking.Booking;
 import ru.practicum.booking.BookingRepository;
 import ru.practicum.booking.BookingStatus;
 import ru.practicum.error.NotFoundException;
-import ru.practicum.error.ValidationException;
+import ru.practicum.error.InvalidDataException;
 import ru.practicum.item.comment.*;
 import ru.practicum.item.dto.ItemDto;
 import ru.practicum.item.dto.ItemGetAllResponseDto;
@@ -120,15 +120,11 @@ public class ItemService {
 
     @Transactional(readOnly = true)
     public List<ItemDto> searchByText(String text, Long userId) {
-        if (text == null || text.isEmpty()) {
-            return new ArrayList<>();
-        } else {
-            userService.getById(userId);
-            return itemRepository.searchByText(text).stream()
-                    .filter(item -> item.getAvailable().equals(true))
-                    .map(itemMapper::toDTO)
-                    .collect(Collectors.toList());
-        }
+        userService.getById(userId);
+        return itemRepository.searchByText(text).stream()
+                .filter(item -> item.getAvailable().equals(true))
+                .map(itemMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     public CommentResponseDto addComment(Long id, Long userId, CommentDto commentDto) {
@@ -137,7 +133,7 @@ public class ItemService {
                 .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
                 .filter(booking -> booking.getStatus().equals(BookingStatus.APPROVED))
                 .findFirst()
-                .orElseThrow(() -> new ValidationException("Некорректные данные"));
+                .orElseThrow(() -> new InvalidDataException("Некорректные данные"));
 
         Comment comment = commentMapper.toComment(commentDto);
         Item item = itemRepository.findById(id).orElseThrow(() -> new NotFoundException("Вещь не найдена"));

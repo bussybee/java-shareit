@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.booking.dto.BookingDto;
 import ru.practicum.booking.dto.BookingResponseDto;
-import ru.practicum.error.ValidationException;
+import ru.practicum.error.InvalidDataException;
 import ru.practicum.item.Item;
 import ru.practicum.item.ItemMapper;
 import ru.practicum.item.ItemService;
@@ -44,11 +44,11 @@ public class BookingService {
         booking.setStatus(BookingStatus.WAITING);
 
         if (booking.getStart().isEqual(booking.getEnd())) {
-            throw new ValidationException("Время начала и окончания не могут совпадать");
+            throw new InvalidDataException("Время начала и окончания не могут совпадать");
         }
 
         if (!item.getAvailable()) {
-            throw new ValidationException("Вещь не доступна для аренды");
+            throw new InvalidDataException("Вещь не доступна для аренды");
         }
 
         return bookingMapper.toResponseDto(bookingRepository.save(booking));
@@ -76,7 +76,7 @@ public class BookingService {
                 || booking.get().getBooker().getId().equals(userId))) {
             return bookingMapper.toResponseDto(booking.get());
         } else {
-            throw new ValidationException("Бронирование не найдено");
+            throw new InvalidDataException("Бронирование не найдено");
         }
     }
 
